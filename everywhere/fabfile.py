@@ -1,9 +1,26 @@
+
+# clusterr pi.r hosts.ini ghap
+
 import sys
+import os
 import configparser
-from fabric.api import run, env, execute
+from fabric.api import *
+from fabric.operations import *
 
 def host_type():
 	run('ls -al')
+
+def runr(script_name):
+	# TODO: this directory is different on different clusters
+	with cd('/torquefs'):
+		cwd = os.getcwd()
+		local_path = os.path.join(cwd, script_name)
+		put(local_path, script_name)
+		output = run('Rscript %s' % script_name)
+
+	print("*" * 50)
+	print("Script output:")
+	print(output)
 
 if __name__ == '__main__':
 	
@@ -28,22 +45,6 @@ if __name__ == '__main__':
 		"%s@%s:22" % (username, server): password
 	}
 
-	execute(host_type)
+	execute(runr, script_name)
 
 
-
-# # NEXT: copy file in cli arg to server
-# # THEN: run it
-# # THEN: emit its outputs
-
-# # MAYBE: wrap as a pip package that Jeremy can run?
-
-# pip install clusterr
-
-# clusterr pi.r ghap
-
-# (if not in env)
-# Prompt username
-# Prompt password
-
-# clusterr pi.r hosts.ini ghap
