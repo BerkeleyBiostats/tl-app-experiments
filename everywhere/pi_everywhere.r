@@ -1,6 +1,6 @@
 library(batchtools)
 
-args = commandArgs(trailingOnly=TRUE)
+# Multi-target cluster functions -----------------------------------------------------------------
 
 makeClusterRegistry = function(target) {
 	if (target == 'local'){
@@ -14,6 +14,10 @@ makeClusterRegistry = function(target) {
 		print('Unrecognized target')
 	}
 }
+
+# -----------------------------------------------------------------------------------------------
+
+args = commandArgs(trailingOnly=TRUE)
 
 target = args[1]
 
