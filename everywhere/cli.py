@@ -26,6 +26,10 @@ def runr(script_name):
 		run('rm -rf /torquefs/pitorque')
 		output = run('Rscript %s ghap' % script_name)
 
+		print("Script output")
+		print("="*50)
+		print(output)
+
 
 if __name__ == '__main__':
 	
