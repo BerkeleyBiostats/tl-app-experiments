@@ -22,7 +22,7 @@ Run:
 
 Also try locally:
 
-	Rscript pi_everywhere.r
+	Rscript pi_everywhere.r local
 
 
 Batchtools on Savio
