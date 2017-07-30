@@ -16,16 +16,19 @@ def runr(script_name):
 		cwd = os.getcwd()
 		local_path = os.path.join(cwd, script_name)
 		put(local_path, script_name)
-		output = run('Rscript %s' % script_name)
 
-	print("*" * 50)
-	print("Script output:")
-	print(output)
+		# TODO: generate this dynamically? Or, at least, choose based on cluster
+		template_name = 'torque.tmpl'
+		local_path_tmpl = os.path.join(cwd, template_name)
+		put(local_path_tmpl, template_name)
+
+		run('R -e "install.packages(\'batchtools\', dependencies=TRUE, repos=\'http://cran.rstudio.com/\')"')
+		run('rm -rf /torquefs/pitorque')
+		output = run('Rscript %s ghap' % script_name)
+
 
 if __name__ == '__main__':
 	
-	print(sys.argv)
-
 	args = sys.argv
 
 	script_name = args[1]

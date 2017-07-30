@@ -1,88 +1,33 @@
-
-
 library(batchtools)
-# library(clusters)
 
-makeClustersRegistry = function (local = NULL, savio = NULL, ghap = NULL) {
+args = commandArgs(trailingOnly=TRUE)
 
-	args = commandArgs(trailingOnly = TRUE)
-
-	print(args)
-
-	# reg = makeRegistry(
-	# 	file.dir = '/global/home/users/marcpare/pi', 
-	# 	seed = 1
-	# )
-
-	reg = makeRegistry(
-		file.dir = NA,
-		seed = 1
-	)
-
-	return(reg)
+makeClusterRegistry = function(target) {
+	if (target == 'local'){
+		return(makeRegistry(file.dir = NA, seed = 1))
+	} else if (target == 'ghap'){
+		reg = makeRegistry(file.dir = '/torquefs/pitorque', seed = 1)
+		reg$cluster.functions = makeClusterFunctionsTORQUE(template="/torquefs/torque.tmpl", scheduler.latency = 1, fs.latency = 65)
+		saveRegistry(reg=reg)
+		return(reg)
+	} else {
+		print('Unrecognized target')
+	}
 }
 
-reg = makeClustersRegistry(
+target = args[1]
 
-	# Maybe even provide defaults for this e.g. /tmp, ~
-	local=list(
-		file.dir = '/global/home/users/marcpare/pi', 
-		seed = 1
-	),
-
-	# Can override settings like...
-	savio=list(
-		scheduler.latency=2
-	)
-
-)
-
-# Handled by makeClustersRegistry
-# reg = makeRegistry(
-# 	file.dir = '/global/home/users/marcpare/pi', 
-# 	seed = 1
-# )
-
-# reg$cluster.functions = makeClusterFunctionsSlurm(
-# 	template="/global/home/users/marcpare/batchtools.slurm.tmpl",
-#   	clusters = NULL, 
-#   	array.jobs = TRUE, 
-#   	scheduler.latency = 1,
-#   	fs.latency = 65
-#  ) 
-# saveRegistry(reg=reg)
+reg = makeClusterRegistry(target)
 
 piApprox = function(n) {
   nums = matrix(runif(2 * n), ncol = 2)
   d = sqrt(nums[, 1]^2 + nums[, 2]^2)
   4 * mean(d <= 1)
 }
-piApprox(1000)
-
 
 batchMap(fun = piApprox, n = rep(1e5, 10))
 
-names(getJobTable())
-
-clusterSubmitJobs(
-	resources = list(
-		walltime = 3600, 
-		memory = 1024, 
-		ncpus=1, 
-		partition='savio2' # this gets added when CLI arg is savio
-)
-
-submitJobs()
-
+submitJobs(resources = list(walltime = 3600, memory = 1024, ncpus=1))
 waitForJobs()
-
 mean(sapply(1:10, loadResult))
 reduceResults(function(x, y) x + y) / 10
-
-
-
-
-
-
-
-
